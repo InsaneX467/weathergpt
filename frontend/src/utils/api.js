@@ -3,7 +3,8 @@
  * Connects frontend to FastAPI backend
  */
 
-const API_BASE = "http://localhost:8000/api";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE = `${BASE_URL.replace(/\/$/, "")}/api`;
 
 async function fetchJSON(url, options = {}) {
   const resp = await fetch(url, {
