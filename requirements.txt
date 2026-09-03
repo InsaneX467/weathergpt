@@ -1,0 +1,2 @@
+# Include requirements from backend
+-r backend/requirements.txt
