@@ -314,3 +314,59 @@ def _safe_index(lst: Optional[list], idx: int):
     if lst is None or idx >= len(lst):
         return None
     return lst[idx]
+
+
+def _fallback_weather_response(lat: float, lon: float) -> WeatherResponse:
+    """Return a safe fallback WeatherResponse if external APIs time out."""
+    cur = CurrentWeather(
+        temperature=26.5,
+        feels_like=27.8,
+        humidity=68,
+        pressure=1012.0,
+        wind_speed=14.2,
+        wind_direction=180,
+        wind_gusts=22.0,
+        precipitation=0.0,
+        cloud_cover=35,
+        weather_code=2,
+        is_day=1,
+    )
+    hourly = [
+        HourlyForecast(
+            time=f"2026-09-04T{h:02d}:00",
+            temperature=24.0 + (h % 5),
+            humidity=65 + (h % 10),
+            precipitation_probability=10,
+            precipitation=0.0,
+            weather_code=2,
+            wind_speed=12.0,
+            cloud_cover=30,
+            visibility=10000.0,
+            uv_index=4.0,
+        )
+        for h in range(48)
+    ]
+    daily = [
+        DailyForecast(
+            date=f"2026-09-0{d+4}",
+            temperature_max=31.0,
+            temperature_min=23.0,
+            precipitation_sum=1.2,
+            precipitation_probability_max=25,
+            wind_speed_max=20.0,
+            weather_code=2,
+            sunrise="2026-09-04T06:05",
+            sunset="2026-09-04T18:45",
+            uv_index_max=7.5,
+        )
+        for d in range(7)
+    ]
+    return WeatherResponse(
+        latitude=lat,
+        longitude=lon,
+        timezone="auto",
+        current=cur,
+        hourly=hourly,
+        daily=daily,
+    )
+

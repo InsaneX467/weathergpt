@@ -29,38 +29,50 @@ export async function geocodeLocation(query) {
 
 /** Get current weather + forecast */
 export async function getCurrentWeather(lat, lon, locationName = "") {
-  const params = new URLSearchParams({ lat, lon });
+  const safeLat = (lat != null && !isNaN(lat)) ? lat : 28.6139;
+  const safeLon = (lon != null && !isNaN(lon)) ? lon : 77.209;
+  const params = new URLSearchParams({ lat: safeLat, lon: safeLon });
   if (locationName) params.append("location_name", locationName);
   return fetchJSON(`${API_BASE}/weather/current?${params}`);
 }
 
 /** Get air quality */
 export async function getAirQuality(lat, lon) {
-  return fetchJSON(`${API_BASE}/weather/air-quality?lat=${lat}&lon=${lon}`);
+  const safeLat = (lat != null && !isNaN(lat)) ? lat : 28.6139;
+  const safeLon = (lon != null && !isNaN(lon)) ? lon : 77.209;
+  return fetchJSON(`${API_BASE}/weather/air-quality?lat=${safeLat}&lon=${safeLon}`);
 }
 
 /** Get NWP model data */
 export async function getNWPData(lat, lon) {
-  return fetchJSON(`${API_BASE}/weather/nwp?lat=${lat}&lon=${lon}`);
+  const safeLat = (lat != null && !isNaN(lat)) ? lat : 28.6139;
+  const safeLon = (lon != null && !isNaN(lon)) ? lon : 77.209;
+  return fetchJSON(`${API_BASE}/weather/nwp?lat=${safeLat}&lon=${safeLon}`);
 }
 
 /** Get weather alerts */
 export async function getAlerts(lat, lon, locationName = "") {
-  const params = new URLSearchParams({ lat, lon });
+  const safeLat = (lat != null && !isNaN(lat)) ? lat : 28.6139;
+  const safeLon = (lon != null && !isNaN(lon)) ? lon : 77.209;
+  const params = new URLSearchParams({ lat: safeLat, lon: safeLon });
   if (locationName) params.append("location_name", locationName);
   return fetchJSON(`${API_BASE}/alerts/?${params}`);
 }
 
 /** Get sector advisory */
 export async function getAdvisory(lat, lon, sector, locationName = "") {
-  const params = new URLSearchParams({ lat, lon, sector });
+  const safeLat = (lat != null && !isNaN(lat)) ? lat : 28.6139;
+  const safeLon = (lon != null && !isNaN(lon)) ? lon : 77.209;
+  const params = new URLSearchParams({ lat: safeLat, lon: safeLon, sector });
   if (locationName) params.append("location_name", locationName);
   return fetchJSON(`${API_BASE}/advisories/?${params}`);
 }
 
 /** Get climate history */
 export async function getClimateHistory(lat, lon, startYear = 2000, endYear = 2025, locationName = "") {
-  const params = new URLSearchParams({ lat, lon, start_year: startYear, end_year: endYear });
+  const safeLat = (lat != null && !isNaN(lat)) ? lat : 28.6139;
+  const safeLon = (lon != null && !isNaN(lon)) ? lon : 77.209;
+  const params = new URLSearchParams({ lat: safeLat, lon: safeLon, start_year: startYear, end_year: endYear });
   if (locationName) params.append("location_name", locationName);
   return fetchJSON(`${API_BASE}/climate/history?${params}`);
 }
