@@ -58,16 +58,6 @@ export default function VoiceAssist({ language, onTranscript, t }) {
     recognition.start();
   }
 
-  function speakText(text) {
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = langMap[language] || "en-IN";
-      utterance.rate = 0.9;
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-
   return (
     <div className="glass-card" style={{ padding: 32, textAlign: "center" }}>
       <h3 style={{ marginBottom: 8, fontSize: "1.1rem" }}>🎤 Voice Assistant</h3>

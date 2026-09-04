@@ -5,14 +5,12 @@ and built-in meteorological fallback (works without any API key).
 """
 
 import re
-import json
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Optional, Dict, Any, List
 from app.services.meteorological import (
-    geocode_location, fetch_current_and_forecast, fetch_air_quality,
-    get_weather_description, fetch_marine_data
+    geocode_location, fetch_current_and_forecast,
+    get_weather_description
 )
 from app.services.warning_system import evaluate_current_alerts, evaluate_forecast_alerts
-from app.schemas import WeatherAlert
 
 
 # ─── Multilingual Translations ────────────────────────────────────
@@ -109,7 +107,7 @@ def detect_intent(message: str) -> str:
     msg_lower = message.lower()
 
     # Check each pattern
-    scores = {}
+    scores: Dict[str, int] = {}
     for intent, pattern in INTENT_PATTERNS.items():
         matches = re.findall(pattern, msg_lower, re.IGNORECASE)
         if matches:
@@ -118,7 +116,7 @@ def detect_intent(message: str) -> str:
     if not scores:
         return "current_weather"  # Default intent
 
-    return max(scores, key=scores.get)
+    return max(scores, key=lambda k: scores[k])
 
 
 def extract_location(message: str) -> Optional[str]:
@@ -240,9 +238,10 @@ async def process_chat_message(
 
 
 def _build_response(
-    intent: str, weather, alerts: list, lang: dict, loc_name: str, language: str
+    intent: str, weather, alerts: list, lang: dict, loc_name: Optional[str], language: str
 ) -> str:
     """Build a formatted weather response string based on detected intent."""
+    loc_name = loc_name or "Location"
     parts = []
 
     cur = weather.current
@@ -364,16 +363,16 @@ def _build_response(
     return "\n".join(parts) if parts else f"Current conditions in {loc_name}: {cur.temperature}°C, {condition_desc}" if cur else lang["error"]
 
 
-def _build_suggestions(intent: str, loc_name: str) -> List[str]:
+def _build_suggestions(intent: str, loc_name: Optional[str] = None) -> List[str]:
     """Generate contextual follow-up suggestions."""
     base_loc = loc_name.split(",")[0] if loc_name else "Delhi"
     suggestions = {
         "current_weather": [f"7-day forecast for {base_loc}", f"Will it rain in {base_loc}?", f"Air quality in {base_loc}"],
         "forecast": [f"Current weather in {base_loc}", f"Farmer advisory for {base_loc}", f"Climate trends for {base_loc}"],
         "rain": [f"Forecast for {base_loc}", f"Flood alerts near {base_loc}", f"Soil moisture for {base_loc}"],
-        "aviation": [f"Wind conditions at {base_loc}", f"Visibility forecast", f"Thunderstorm alerts"],
-        "agriculture": [f"Rain forecast for {base_loc}", f"Soil moisture levels", f"Pest risk assessment"],
-        "marine": [f"Wave forecast", f"Wind speed at {base_loc} coast", f"Fishing advisory"],
-        "urban": [f"AQI forecast for {base_loc}", f"Heat index today", f"Waterlogging risk"],
+        "aviation": [f"Wind conditions at {base_loc}", "Visibility forecast", "Thunderstorm alerts"],
+        "agriculture": [f"Rain forecast for {base_loc}", "Soil moisture levels", "Pest risk assessment"],
+        "marine": ["Wave forecast", f"Wind speed at {base_loc} coast", "Fishing advisory"],
+        "urban": [f"AQI forecast for {base_loc}", "Heat index today", "Waterlogging risk"],
     }
     return suggestions.get(intent, [f"Weather in {base_loc}", f"Forecast for {base_loc}", "Show active alerts"])

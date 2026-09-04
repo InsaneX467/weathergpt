@@ -87,7 +87,7 @@ export default function ChatInterface({ language, location, t }) {
         utterance.volume = 0.8;
         // Don't auto-play TTS, let user trigger it
       }
-    } catch (err) {
+    } catch {
       setMessages((prev) => [...prev, {
         role: "assistant",
         content: "⚠️ Unable to connect to the WeatherGPT server. Please ensure the backend is running on `localhost:8000`.",

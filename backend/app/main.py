@@ -8,7 +8,6 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import json
-import asyncio
 
 from app.routers import weather, chat, alerts, advisories, climate
 from app.services.voice_service import get_supported_languages

@@ -26,19 +26,6 @@ export default function WeatherMap({ location, weather }) {
     ? [location.latitude, location.longitude]
     : [20.5937, 78.9629]; // Default to India
 
-  const weatherLayers = [
-    {
-      name: "Temperature",
-      url: "https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=demo",
-      active: false,
-    },
-    {
-      name: "Precipitation",
-      url: "https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=demo",
-      active: false,
-    },
-  ];
-
   const cur = weather?.current;
   const emoji = cur?.weather_code != null ? getEmoji(cur.weather_code) : "📍";
 
