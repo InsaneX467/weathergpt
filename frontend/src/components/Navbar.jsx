@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { geocodeLocation } from "../utils/api";
 
-export default function Navbar({ language, setLanguage, location, setLocation, t }) {
+export default function Navbar({ language, setLanguage, location, setLocation, onRefresh, loadingWeather, t }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -62,18 +62,18 @@ export default function Navbar({ language, setLanguage, location, setLocation, t
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand">
-        <div className="logo-icon">⛅</div>
-        <span>WeatherGPT</span>
-      </div>
+      <div className="navbar-inner">
+        <div className="navbar-brand">
+          <div className="logo-icon">⛅</div>
+          <span>WeatherGPT</span>
+        </div>
 
-      <div className="navbar-controls">
         <div className="location-search" ref={searchRef}>
-          <span className="location-search-icon">📍</span>
+          <span className="location-search-icon">🔍</span>
           <input
             className="location-input"
             type="text"
-            placeholder={t.search}
+            placeholder={t.search || "Search city or location..."}
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             onFocus={() => searchResults.length > 0 && setShowResults(true)}
@@ -94,22 +94,36 @@ export default function Navbar({ language, setLanguage, location, setLocation, t
           )}
         </div>
 
-        {location && (
-          <div className="nav-btn active">
-            <span className="status-dot live"></span>
-            <span>{location.name.split(",")[0]}</span>
-          </div>
-        )}
+        <div className="navbar-controls">
+          {location && (
+            <div className="nav-btn active">
+              <span className="status-dot live"></span>
+              <span>{location.name.split(",")[0]}</span>
+            </div>
+          )}
 
-        <select
-          className="lang-select"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-        >
-          {languages.map((l) => (
-            <option key={l.code} value={l.code}>{l.name}</option>
-          ))}
-        </select>
+          {onRefresh && (
+            <button
+              className="nav-btn refresh-btn"
+              onClick={onRefresh}
+              disabled={loadingWeather}
+              title="Fetch fresh live weather data from API"
+            >
+              <span className={loadingWeather ? "spinning-icon" : ""}>🔄</span>
+              <span>{loadingWeather ? "Refreshing..." : "Live Sync"}</span>
+            </button>
+          )}
+
+          <select
+            className="lang-select"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+          >
+            {languages.map((l) => (
+              <option key={l.code} value={l.code}>{l.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
     </nav>
   );

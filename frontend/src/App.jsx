@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import translations from "./utils/translations";
 import { getCurrentWeather, getAirQuality } from "./utils/api";
 
-import Navbar from "./components/Navbar";
+import SidebarNav from "./components/SidebarNav";
+import RightSidebar from "./components/RightSidebar";
+import TopDataHeader from "./components/TopDataHeader";
 import WeatherCard from "./components/WeatherCard";
 import ForecastChart from "./components/ForecastChart";
 import ChatInterface from "./components/ChatInterface";
@@ -11,7 +13,6 @@ import NWPViewer from "./components/NWPViewer";
 import AlertsPanel from "./components/AlertsPanel";
 import Advisories from "./components/Advisories";
 import ClimateTrends from "./components/ClimateTrends";
-import VoiceAssist from "./components/VoiceAssist";
 
 export default function App() {
   const [language, setLanguage] = useState("en");
@@ -20,11 +21,11 @@ export default function App() {
   const [weather, setWeather] = useState(null);
   const [aqi, setAqi] = useState(null);
   const [loadingWeather, setLoadingWeather] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const t = translations[language] || translations.en;
 
-  // Fetch weather when location changes
-  useEffect(() => {
+  const fetchLiveData = () => {
     if (!location) return;
     setLoadingWeather(true);
     Promise.all([
@@ -40,6 +41,11 @@ export default function App() {
         setAqi(null);
       })
       .finally(() => setLoadingWeather(false));
+  };
+
+  // Fetch weather when location changes
+  useEffect(() => {
+    fetchLiveData();
   }, [location]);
 
   // Try to get user's location on mount
@@ -54,7 +60,6 @@ export default function App() {
           });
         },
         () => {
-          // Default to New Delhi if geolocation denied
           setLocation({
             name: "New Delhi, India",
             latitude: 28.6139,
@@ -72,41 +77,56 @@ export default function App() {
   }, []);
 
   const tabs = [
-    { key: "dashboard", icon: "📊", label: t.tabs.dashboard },
-    { key: "chat", icon: "💬", label: t.tabs.chat },
-    { key: "forecast", icon: "📈", label: t.tabs.forecast },
-    { key: "map", icon: "🗺️", label: t.tabs.map },
-    { key: "nwp", icon: "🛰️", label: t.tabs.nwp },
-    { key: "alerts", icon: "🚨", label: t.tabs.alerts },
-    { key: "advisories", icon: "📋", label: t.tabs.advisories },
-    { key: "climate", icon: "📊", label: t.tabs.climate },
+    { key: "dashboard", icon: "📊", label: t.tabs.dashboard || "Dashboard" },
+    { key: "chat", icon: "💬", label: t.tabs.chat || "Chat Assistant" },
+    { key: "forecast", icon: "📈", label: t.tabs.forecast || "Forecast" },
+    { key: "map", icon: "🗺️", label: t.tabs.map || "Weather Map" },
+    { key: "nwp", icon: "🛰️", label: t.tabs.nwp || "NWP Models" },
+    { key: "alerts", icon: "🚨", label: t.tabs.alerts || "Alerts" },
+    { key: "advisories", icon: "📋", label: t.tabs.advisories || "Advisories" },
+    { key: "climate", icon: "📊", label: t.tabs.climate || "Climate Trends" },
   ];
 
   return (
-    <>
-      <div className="weather-bg" />
-
-      <Navbar
-        language={language}
-        setLanguage={setLanguage}
-        location={location}
-        setLocation={setLocation}
-        t={t}
-      />
-
-      <div className="tab-nav">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            className={`tab-btn ${activeTab === tab.key ? "active" : ""}`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            <span>{tab.icon}</span> {tab.label}
-          </button>
-        ))}
+    <div className="app-layout">
+      {/* Mobile Header Bar */}
+      <div className="mobile-header">
+        <button className="mobile-menu-btn" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
+          ☰ Menu
+        </button>
+        <div className="mobile-brand">⛅ WeatherGPT</div>
       </div>
 
-      <main className="main-content">
+      {/* Left Navigation Sidebar */}
+      <div className={`sidebar-wrapper left ${mobileSidebarOpen ? "mobile-open" : ""}`}>
+        <SidebarNav
+          tabs={tabs}
+          activeTab={activeTab}
+          setActiveTab={(tab) => {
+            setActiveTab(tab);
+            setMobileSidebarOpen(false);
+          }}
+          location={location}
+          setLocation={setLocation}
+          language={language}
+          setLanguage={setLanguage}
+          onRefresh={fetchLiveData}
+          loadingWeather={loadingWeather}
+          t={t}
+        />
+      </div>
+
+      {/* Center Main Data Representation Area */}
+      <main className="main-content-area">
+        {/* Prominent Global Top Data Header Search */}
+        <TopDataHeader
+          location={location}
+          setLocation={setLocation}
+          weather={weather}
+          loadingWeather={loadingWeather}
+          onRefresh={fetchLiveData}
+          t={t}
+        />
         {activeTab === "dashboard" && (
           <>
             <WeatherCard weather={weather} aqi={aqi} t={t} />
@@ -145,20 +165,18 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer style={{
-        textAlign: "center",
-        padding: "20px 24px",
-        borderTop: "1px solid var(--border-glass)",
-        fontSize: "0.78rem",
-        color: "var(--text-muted)",
-      }}>
-        <p>
-          WeatherGPT — AI Weather Intelligence Platform •
-          Data: Open-Meteo (GFS/ECMWF/ICON) •
-          Built with FastAPI + React
-        </p>
-      </footer>
-    </>
+      {/* Right Context Sidebar */}
+      <div className="sidebar-wrapper right">
+        <RightSidebar
+          weather={weather}
+          aqi={aqi}
+          location={location}
+          setLocation={setLocation}
+          language={language}
+          t={t}
+        />
+      </div>
+    </div>
   );
 }
+

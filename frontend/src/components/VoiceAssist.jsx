@@ -59,81 +59,76 @@ export default function VoiceAssist({ language, onTranscript, t }) {
   }
 
   return (
-    <div className="glass-card" style={{ padding: 32, textAlign: "center" }}>
-      <h3 style={{ marginBottom: 8, fontSize: "1.1rem" }}>🎤 Voice Assistant</h3>
-      <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", marginBottom: 24 }}>
-        {t.voiceHint} — Ask about weather in {langMap[language]?.split("-")[0] === "en" ? "English" : "your language"}
-      </p>
-
-      {/* Large voice button */}
+    <div style={{ textAlign: "center", width: "100%" }}>
+      {/* Featured Pulsing Mic Button */}
       <button
         onClick={startListening}
         disabled={isListening}
         style={{
-          width: 120,
-          height: 120,
+          width: 72,
+          height: 72,
           borderRadius: "50%",
-          border: isListening ? "3px solid var(--accent-rose)" : "3px solid var(--border-glass)",
-          background: isListening ? "rgba(244, 63, 94, 0.15)" : "var(--bg-glass)",
-          color: isListening ? "var(--accent-rose)" : "var(--text-primary)",
-          fontSize: "2.5rem",
+          border: isListening ? "3px solid #f43f5e" : "3px solid #3b82f6",
+          background: isListening ? "rgba(244, 63, 94, 0.15)" : "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
+          color: isListening ? "#f43f5e" : "#2563eb",
+          fontSize: "1.8rem",
           cursor: "pointer",
           transition: "all 0.3s ease",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          margin: "0 auto 20px",
+          margin: "0 auto 12px",
+          boxShadow: isListening
+            ? "0 0 20px rgba(244, 63, 94, 0.5)"
+            : "0 4px 14px rgba(37, 99, 235, 0.2)",
           animation: isListening ? "pulse-recording 1.5s ease-in-out infinite" : "none",
         }}
       >
         {isListening ? "⏹️" : "🎤"}
       </button>
 
-      <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: 12 }}>
-        {status === "listening" && "🔴 Listening..."}
-        {status === "done" && "✅ Recognized"}
-        {status === "error" && "❌ Error — please try again"}
-        {status === "not-supported" && "⚠️ Speech recognition not supported in this browser"}
-        {status === "idle" && "Ready to listen"}
+      {/* Voice Status Text */}
+      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: isListening ? "#dc2626" : "var(--text-primary)", marginBottom: 8 }}>
+        {status === "listening" && "🔴 Listening... Speak now"}
+        {status === "done" && "✅ Recognized Speech"}
+        {status === "error" && "❌ Error — Tap to try again"}
+        {status === "not-supported" && "⚠️ Browser Speech Unsupported"}
+        {status === "idle" && "Tap Mic & Ask Natural Weather Question"}
       </div>
 
       {transcript && (
         <div style={{
-          background: "var(--bg-glass)",
-          border: "1px solid var(--border-glass)",
-          borderRadius: "var(--radius-md)",
-          padding: 16,
-          fontSize: "1rem",
-          fontWeight: 500,
-          maxWidth: 400,
-          margin: "0 auto",
+          background: "#ffffff",
+          border: "1px solid #bfdbfe",
+          borderRadius: 8,
+          padding: "8px 12px",
+          fontSize: "0.84rem",
+          fontWeight: 600,
+          color: "#1e40af",
+          marginBottom: 10,
         }}>
           "{transcript}"
         </div>
       )}
 
-      {/* Supported languages */}
-      <div style={{ marginTop: 24 }}>
-        <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: 8 }}>
-          Supported voice languages:
-        </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" }}>
-          {Object.entries(langMap).map(([code, locale]) => (
-            <span
-              key={code}
-              style={{
-                background: language === code ? "rgba(59, 130, 246, 0.15)" : "var(--bg-glass)",
-                border: `1px solid ${language === code ? "rgba(59, 130, 246, 0.3)" : "var(--border-glass)"}`,
-                borderRadius: "var(--radius-full)",
-                padding: "3px 10px",
-                fontSize: "0.72rem",
-                color: language === code ? "var(--accent-blue)" : "var(--text-muted)",
-              }}
-            >
-              {locale}
-            </span>
-          ))}
-        </div>
+      {/* Supported Languages Pills */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "center", marginTop: 8 }}>
+        {Object.entries(langMap).map(([code, locale]) => (
+          <span
+            key={code}
+            style={{
+              background: language === code ? "#2563eb" : "#f1f5f9",
+              border: `1px solid ${language === code ? "#1d4ed8" : "#e2e8f0"}`,
+              borderRadius: "var(--radius-full)",
+              padding: "2px 8px",
+              fontSize: "0.68rem",
+              fontWeight: 600,
+              color: language === code ? "#ffffff" : "var(--text-muted)",
+            }}
+          >
+            {locale}
+          </span>
+        ))}
       </div>
     </div>
   );
