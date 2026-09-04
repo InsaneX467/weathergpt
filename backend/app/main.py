@@ -1,7 +1,8 @@
 """
 WeatherGPT — FastAPI Application Entry Point
-Real-time weather intelligence platform with conversational AI, NWP model integration,
-extreme weather alerts, sector advisories, and multilingual support.
+Real-time weather intelligence platform with conversational AI,
+NWP model integration, extreme weather alerts, sector advisories,
+and multilingual support.
 """
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -11,6 +12,8 @@ import json
 
 from app.routers import weather, chat, alerts, advisories, climate
 from app.services.voice_service import get_supported_languages
+from app.services.meteorological import fetch_current_and_forecast
+from app.services.warning_system import evaluate_current_alerts
 
 
 @asynccontextmanager
@@ -25,8 +28,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="WeatherGPT API",
-    description="AI-powered weather intelligence platform with real-time forecasting, "
-                "NWP model integration, disaster alerts, and multilingual support.",
+    description=(
+        "AI-powered weather intelligence platform with real-time forecasting, "
+        "NWP model integration, disaster alerts, and multilingual support."
+    ),
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -112,8 +117,6 @@ async def websocket_alerts(websocket: WebSocket):
                 lat = payload.get("latitude")
                 lon = payload.get("longitude")
                 if lat and lon:
-                    from app.services.meteorological import fetch_current_and_forecast
-                    from app.services.warning_system import evaluate_current_alerts
                     weather_data = await fetch_current_and_forecast(lat, lon)
                     if weather_data.current:
                         alerts_list = evaluate_current_alerts(
